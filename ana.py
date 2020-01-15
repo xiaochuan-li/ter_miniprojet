@@ -24,16 +24,16 @@ def trans_list(l):
 
 def fft_auto(time, y, te=1 / 20000, fstop=None):
     x = np.linspace(0, len(time) * te, len(time)) / (len(time) * te ** 2)
-    #y_fft = np.real(fft(y)) / (len(x) / 2)
-    y_fft=fft(y)
-    y_angle=np.angle(y_fft)
-    y_fft = np.abs(y_fft) / (len(x) /2)
+    # y_fft = np.real(fft(y)) / (len(x) / 2)
+    y_fft = fft(y)
+    y_angle = np.angle(y_fft)
+    y_fft = np.abs(y_fft) / (len(x) / 2)
     y_fft = y_fft[:len(x) // 2]
     x = x[:len(x) // 2]
     if fstop is not None:
         x = x[x < fstop]
         y_fft = y_fft[:len(x)]
-    return x, y_fft,y_angle
+    return x, y_fft, y_angle
 
 
 def find_pic(x, y, seuil=0.1, num=40):
@@ -63,34 +63,39 @@ def toString(point_x, point_y):
         s += "the {} pic : Fe = {:5.3f}; A = {:5.3f}\n".format(ith, term[0], term[1])
     return s
 
-def recompose(point_x,point_y,angle_y):
-    coe=list(zip(point_x,point_y,angle_y))
+
+def recompose(point_x, point_y, angle_y):
+    coe = list(zip(point_x, point_y, angle_y))
+
     def func(x):
-        res=np.zeros_like(x)
+        res = np.zeros_like(x)
         for term in coe:
-            res+=(term[1]*np.cos(x*2*np.pi*term[0]))
+            res += (term[1] * np.cos(x * 2 * np.pi * term[0]))
         return res
+
     return func
 
-def plot_fft(points,x,y):
-    plt.plot(x,y,'y',label='fft')
-    plt.scatter(points[0],points[1])
+
+def plot_fft(points, x, y):
+    plt.plot(x, y, 'y', label='fft')
+    plt.scatter(points[0], points[1])
     plt.show()
+
 
 if __name__ == "__main__":
     time, i, v = read_file()
     te = 1 / 20000
 
-    x, y_fft,y_angle = fft_auto(time, i)
+    x, y_fft, y_angle = fft_auto(time, i)
 
     point_x, point_y = find_pic(x, y_fft)
-    plot_fft([point_x,point_y],x,y_fft)
+    plot_fft([point_x, point_y], x, y_fft)
 
     res = toString(point_x, point_y)
     print(res)
-    repaire=recompose(point_x,point_y,y_angle)
-    y_i=repaire(time)
-    plt.plot(time,y_i,'r',label=u'recomposed line')
-    plt.plot(time,i,label='original line')
+    repaire = recompose(point_x, point_y, y_angle)
+    y_i = repaire(time)
+    plt.plot(time, y_i, 'r', label=u'recomposed line')
+    plt.plot(time, i, label='original line')
     plt.legend()
     plt.show()
