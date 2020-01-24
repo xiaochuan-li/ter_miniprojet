@@ -2,12 +2,32 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.fftpack import fft,ifft
+from scipy.fftpack import fft
 
 
 def read_file(path='scope_1.csv'):
     file = pd.read_csv(path)
     return file['second'].values, file['Ampere'].values, file['Volt'].values
+
+
+def read_txt_file(path='Lampe.csv'):
+    with open(path, 'r') as f:
+        data_str_list = f.readlines()
+        start_t, start_f = filter(lambda x: "x-axis" in data_str_list[x], range(len(data_str_list)))
+        time_serie = data_str_list[start_t + 2:start_f]
+        f_serie = data_str_list[start_f + 2:]
+        data_time = np.zeros((len(time_serie)),
+                             dtype=np.dtype([("time", np.float), ("Ampere", np.float), ("Volt", np.float)], ))
+        data_f = np.zeros((len(f_serie)), dtype=np.dtype([("fre", np.float), ("Ampere", np.float)]))
+        for i, line in enumerate(time_serie):
+            data_time[i] = tuple(np.asarray([float(x) for x in line.replace('\n', '').split(',')]))
+        for i, line in enumerate(f_serie):
+            data_f[i] = tuple(np.asarray([float(x) if x != '' else 0 for x in line.replace('\n', '').split(',')][:2]))
+        data = {
+            "data_time": data_time,
+            "data_f": data_f
+        }
+        return data
 
 
 def trains(s):
@@ -65,34 +85,48 @@ def toString(point_x, point_y):
 
 
 def recompose(point_x, point_y, angle_y):
-
     coe = list(zip(point_x, point_y, angle_y))
-    coe = [x[1]*np.exp(np.complex(0,0)) for x in coe]
-    coe=np.asarray(coe)
-    coe=list(zip(coe, point_x))
+    coe = [x[1] * np.exp(np.complex(0, 0)) for x in coe]
+    coe = np.asarray(coe)
+    coe = list(zip(coe, point_x))
 
     def func(x):
-        res = np.zeros(x.shape,dtype=np.complex)
-        j=np.complex(0,1)
+        res = np.zeros(x.shape, dtype=np.complex)
+        j = np.complex(0, 1)
         for term in coe:
             res += (term[0] * np.exp(x * 2 * np.pi * term[1] * j))
         return res
+
     return func
 
 
 def plot_fft(points, x, y):
-    plt.plot(x, y, 'y', label='fft')
-    plt.scatter(points[0], points[1])
+    plt.plot(x, y, 'y', label='FFT Calculé')
+    plt.scatter(points[0], points[1], label='Points Dominants')
+    plt.legend()
     plt.show()
 
 
+def unzip(data, types=None):
+    if types is None:
+        types = ['time', 'Ampere', 'Volt']
+    return [data[type] for type in types]
+
+
 if __name__ == "__main__":
-    time, i, v = read_file()
+    data = read_txt_file()
+    time_serie = data["data_time"]
+    time, i, v = unzip(time_serie)
+    f_serie = data["data_f"]
+    fre, a = unzip(f_serie, types=['fre', 'Ampere'])
+
     te = 1 / 20000
 
-    x, y_fft, y_angle = fft_auto(time, i)
+    x, y_fft, y_angle = fft_auto(time, i, fstop=1000)
 
     point_x, point_y = find_pic(x, y_fft)
+    plt.plot(fre, a, "k", label="FFT Générateur")
+    plt.axis([-250, 1250, 0, 0.03])
     plot_fft([point_x, point_y], x, y_fft)
     res = toString(point_x, point_y)
     repaire = recompose(point_x, point_y, y_angle)
@@ -101,4 +135,3 @@ if __name__ == "__main__":
     plt.plot(time, i, label='original line')
     plt.legend()
     plt.show()
-
