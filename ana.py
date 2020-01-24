@@ -20,6 +20,12 @@ class DataCsv:
         self.point_x, self.point_y, self.pic_index = find_pic(self.fft_x, self.fft_y_abs, thread=self.thread)
         self.y_re = gen_f_pics(self.fft_y, self.pic_index)
 
+    def save_spectres(self, path):
+        with open(path, "w") as f:
+            for index in self.pic_index:
+                f.write('{:9.7} {:9.7} {:9.7}\n'.format(self.fft_x[index], np.real(self.fft_y[index]),
+                                                        np.imag(self.fft_y[index])))
+
     def analyse(self, data_x=None, data_y=None):
         data_x = self.t if data_x is None else data_x
         data_y = self.i if data_y is None else data_y
@@ -46,7 +52,7 @@ class DataCsv:
         plt.ylabel("courant(A)")
         plt.plot(np.linspace(self.t[0], self.t[-1], len(self.recompose_y)), self.recompose_y, 'r',
                  label=u'inversed line')
-        plt.plot(np.linspace(self.t[0], self.t[-1], len(self.y_re)), self.y_re, 'yo', label=u'recomposed line')
+        plt.plot(np.linspace(self.t[0], self.t[-1], len(self.y_re)), np.real(self.y_re), 'yo', label=u'recomposed line')
         plt.plot(self.t, self.i, "b.", label='original line')
         plt.legend()
         plt.show()
@@ -66,8 +72,17 @@ class Data:
         self.png = cv2.imread(png_path)
 
     def show_res_gen(self):
-        cv2.imshow("resultat d'osciloscope", self.png)
-        cv2.waitKey()
+        plt.imshow(self.png)
+        plt.show()
+
+    def plot_fft(self):
+        self.data_in.plot_fft()
+
+    def plot_recompose(self):
+        self.data_in.plot_recompose()
+
+    def save_spectres(self, path):
+        self.data_in.save_spectres(path)
 
 
 def read_txt_file(path='Lampe.csv'):
@@ -133,11 +148,12 @@ def gen_f_pics(array_fe, list_points):
     for index in list_points:
         new_array[index] = array_fe[index]
     new_array = ifft(new_array)
-    return np.real(new_array)
+    return new_array
 
 
 if __name__ == "__main__":
     data = Data("Lampe.csv", "Lamp.png", freq_stop=None)
-    data.data_in.plot_fft()
-    data.data_in.plot_recompose()
-    # data.show_res_gen()
+    data.plot_fft()
+    data.plot_recompose()
+    data.show_res_gen()
+    data.save_spectres("test.txt")
