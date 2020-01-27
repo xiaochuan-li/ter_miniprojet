@@ -1,16 +1,18 @@
 # *_*coding:utf-8 *_*
+import os
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.fftpack import fft, ifft
-import os
 
 
 class DataCsv:
-    def __init__(self, data_time, data_freq, freq_stop, thread, save_path):
+    def __init__(self, data_time, data_freq, freq_stop, thread, save_path, display):
         self.save_path = save_path
         self.data_time = data_time
         self.data_freq = data_freq
+        self.display = display
         self.t, self.i, self.v = unzip(self.data_time)
         self.f, self.a = unzip(self.data_freq, types=['fre', 'Ampere'])
         self.delta_t = (self.t[-1] - self.t[0]) / len(self.t)
@@ -46,11 +48,10 @@ class DataCsv:
         plt.plot(self.fft_x, self.fft_y_abs, 'y', label='FFT Calculé')
         plt.scatter(self.point_x, self.point_y, label='Points Dominants')
         plt.legend()
-        if self.save_path is None:
+        plt.savefig(os.path.join(self.save_path, "FFT.png"))
+        if self.display:
             plt.show()
-        else:
-            plt.savefig(os.path.join(self.save_path, "FFT.png"))
-            plt.close()
+        plt.close()
 
     def plot_recompose(self):
         plt.title("Plot des Signals")
@@ -61,11 +62,11 @@ class DataCsv:
         plt.plot(np.linspace(self.t[0], self.t[-1], len(self.y_re)), np.real(self.y_re), 'yo', label=u'recomposed line')
         plt.plot(self.t, self.i, "b.", label='original line')
         plt.legend()
-        if self.save_path is None:
+        plt.savefig(os.path.join(self.save_path, "RECOMPOSED.png"))
+        if self.display:
             plt.show()
-        else:
-            plt.savefig(os.path.join(self.save_path, "RECOMPOSED.png"))
-            plt.close()
+        plt.close()
+
     def toString(self):
         res = list(zip(self.point_x, self.point_y))
         return '\n'.join(
@@ -73,26 +74,30 @@ class DataCsv:
 
 
 class Data:
-    def __init__(self, csv_path, png_path, freq_stop=None, thread=0.25, display_dir=None):
-        self.plot_dir = display_dir
-        if self.plot_dir is not None and not os.path.isdir(self.plot_dir):
+    def __init__(self, csv_path, png_path, freq_stop=None, thread=0.25, save_dir="result", display=False):
+        self.plot_dir = save_dir
+        self.display = display
+        if not os.path.isdir(self.plot_dir):
             os.mkdir(self.plot_dir)
         self.csv_path = csv_path
         self.png_path = png_path
         data_time, data_f = read_txt_file(csv_path)
         self.data_in = DataCsv(data_time=data_time, data_freq=data_f, freq_stop=freq_stop, thread=thread,
-                               save_path=self.plot_dir)
-        self.png = cv2.imread(png_path)
+                               save_path=self.plot_dir, display=self.display)
+        try:
+            self.png = cv2.imread(png_path)
+        except:
+            self.png = np.zeros((480, 720))
+            print("no png available")
 
     def show_res_gen(self):
-        if self.plot_dir is not None:
+        if not self.display:
             print("Display not allowed in save mode")
         else:
             plt.imshow(self.png)
             plt.show()
 
     def plot_fft(self):
-
         self.data_in.plot_fft()
 
     def plot_recompose(self):
@@ -110,7 +115,7 @@ def read_txt_file(path='Lampe.csv'):
             time_serie = data_str_list[start_t + 2:start_f]
             f_serie = data_str_list[start_f + 2:]
             data_time = np.zeros((len(time_serie)),
-                             dtype=np.dtype([("time", np.float), ("Ampere", np.float), ("Volt", np.float)], ))
+                                 dtype=np.dtype([("time", np.float), ("Ampere", np.float), ("Volt", np.float)], ))
             data_f = np.zeros((len(f_serie)), dtype=np.dtype([("fre", np.float), ("Ampere", np.float)]))
             for i, line in enumerate(time_serie):
                 data_time[i] = tuple(np.asarray([float(x) for x in line.replace('\n', '').split(',')]))
@@ -173,9 +178,48 @@ def gen_f_pics(array_fe, list_points):
     return new_array
 
 
+def check_dir(dir):
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
+    return dir
+
+
+class Config:
+    def __init__(self, csv_dir, png_dir, freq_stop, save_dir, display=False):
+        self.csv_dir = check_dir(csv_dir)
+        self.png_dir = check_dir(png_dir)
+        self.freq_stop = freq_stop
+        self.save_dir = check_dir(save_dir)
+        self.display = display
+        self.csv_png = self.match()
+
+    def __call__(self, *args, **kwargs):
+        for i, term in enumerate(self.csv_png):
+            name = os.path.basename(term[0])[:-4]
+            print("Traiting the data : {}".format(name))
+            check_dir(os.path.join(self.save_dir, name))
+            data = Data(term[0], term[1], freq_stop=self.freq_stop,
+                        save_dir=os.path.join(self.save_dir, name), display=self.display)
+            data.plot_fft()
+            data.plot_recompose()
+            data.show_res_gen()
+
+            data.save_spectres(os.path.join(self.save_dir, name, "test.txt"))
+
+    def match(self):
+        csv_lst = list(filter(lambda x: ".csv" in x, os.listdir(self.csv_dir)))
+        png_lst = [x.replace('.csv', '.png') for x in csv_lst]
+        return [(os.path.join(self.csv_dir, x[0]), os.path.join(self.png_dir, x[1])) for x in
+                list(zip(csv_lst, png_lst))]
+
+
 if __name__ == "__main__":
+    """
     data = Data("Lampe.csv", "Lamp.png", freq_stop=None, display_dir="DISPLAY")
     data.plot_fft()
     data.plot_recompose()
     data.show_res_gen()
     data.save_spectres("test.txt")
+    """
+    conf = Config("data//CSV", "data//PNG", freq_stop=None, display=False, save_dir="DISPLAY")
+    conf()
