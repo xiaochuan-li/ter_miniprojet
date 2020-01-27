@@ -152,8 +152,10 @@ def gen_f_pics(array_fe, list_points):
 
 
 if __name__ == "__main__":
-    data = Data("Lampe.csv", "Lamp.png", freq_stop=None)
+    #data = Data("Lampe.csv", "Lamp.png", freq_stop=None)
+    #data = Data("OrdiEnTraindeCharger.csv", "ordiencharge.png", freq_stop=None)
+    data = Data("Ordicharge.csv", "ordicharge.png", freq_stop=None)
     data.plot_fft()
     data.plot_recompose()
     data.show_res_gen()
-    data.save_spectres("test.txt")
+    data.save_spectres("test_ordicharge.txt")
