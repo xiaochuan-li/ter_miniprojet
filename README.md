@@ -9,8 +9,8 @@
    Auteur Chongmo Zhang
 
 ## Project Structure
-<font face="STCAIYUN">├─.git</font>
-<font face="STCAIYUN">├─.idea</font>
+<font face="STCAIYUN">├─.git</font>  
+<font face="STCAIYUN">├─.idea</font>  
 <font face='STCAIYUN'>├─data</font>  
 <font face='STCAIYUN'>│  ├─CSV</font>  
 <font face='STCAIYUN'>│  │  ├─Lampe.csv</font>  
