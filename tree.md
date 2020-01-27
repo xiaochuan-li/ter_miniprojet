@@ -1,57 +1,47 @@
-C:.  
-│  ana.py  
-│  FFT puissance.xlsx  
-│  README.md  
-│  
-├─.idea    
-│  
+├─.git  
+├─.idea  
 ├─data  
 │  ├─CSV  
-│  │      Lampe.csv  
-│  │      Ordicharge.csv  
-│  │      OrdiEnTraindeCharger.csv  
-│  │  
+│  │  ├─Lampe.csv  
+│  │  ├─Ordicharge.csv  
+│  │  └─OrdiEnTraindeCharger.csv  
 │  └─PNG  
-│          Lamp.png  
-│          ordicharge.png  
-│          ordiencharge.png  
-│  
+│     ├─Lamp.png  
+│     ├─ordicharge.png  
+│     └─ordiencharge.png  
 ├─DISPLAY  
 │  ├─Lampe  
-│  │      FFT.png  
-│  │      RECOMPOSED.png  
-│  │      test.txt  
-│  │  
+│  │  ├─FFT.png  
+│  │  ├─RECOMPOSED.png  
+│  │  └─test.txt  
 │  ├─Ordicharge  
-│  │      FFT.png  
-│  │      RECOMPOSED.png  
-│  │      test.txt  
-│  │    
+│  │  ├─FFT.png  
+│  │  ├─RECOMPOSED.png  
+│  │  └─test.txt  
 │  └─OrdiEnTraindeCharger  
-│          FFT.png  
-│          RECOMPOSED.png  
-│          test.txt  
-│  
-└─exp20200117  
-    │  exampleModell.slx  
-    │  exampleModell.slxc  
-    │  simulinkModell_App.mlapp  
-    │  updateApp.m  
-    │  
-    └─slprj  
-        │  desktop.ini  
-        │  
-        └─sim  
-            │  desktop.ini  
-            │  
-            └─varcache  
-                │  desktop.ini  
-                │   
-                └─exampleModell  
-                    │  checksumOfCache.mat  
-                    │  desktop.ini  
-                    │  varInfo.mat  
-                    │  
-                    └─tmwinternal  
-                            desktop.ini  
-                            simulink_cache.xml  
+│     ├─FFT.png  
+│     ├─RECOMPOSED.png  
+│     └─test.txt  
+├─exp20200117  
+│  ├─slprj  
+│  │  ├─sim  
+│  │  │  ├─varcache  
+│  │  │  │  ├─exampleModell  
+│  │  │  │  │  ├─tmwinternal  
+│  │  │  │  │  │  ├─desktop.ini  
+│  │  │  │  │  │  └─simulink_cache.xml  
+│  │  │  │  │  ├─checksumOfCache.mat  
+│  │  │  │  │  ├─desktop.ini  
+│  │  │  │  │  └─varInfo.mat  
+│  │  │  │  └─desktop.ini  
+│  │  │  └─desktop.ini  
+│  │  └─desktop.ini  
+│  ├─exampleModell.slx  
+│  ├─exampleModell.slxc  
+│  ├─simulinkModell_App.mlapp  
+│  └─updateApp.m  
+├─ana.py  
+├─FFT puissance.xlsx  
+├─README.md  
+├─tree.md  
+└─utils.py  
