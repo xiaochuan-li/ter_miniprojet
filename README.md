@@ -1,12 +1,13 @@
 # Modélisation en charge domicile
 
 ## FFT en signaux testés en python
-   Version 1.0
+   Version 2.0
    Auteur Xiaochuan LI
 
 ## Simulink GUI interface
-   Version 1.0
+   Version 2.0
    Auteur Chongmo Zhang
+   Dispositifs non linéaires : ordinateur et lampe
 
 ## Project Structure
 <font face="STCAIYUN">├─.git</font>  
@@ -56,3 +57,5 @@
 <font face='STCAIYUN'>├─README.md</font>  
 <font face='STCAIYUN'>├─tree.md</font>  
 <font face='STCAIYUN'>└─utils.py</font>  
+
+Editeur: LI Xiaochuan / HUO Jiaxi
