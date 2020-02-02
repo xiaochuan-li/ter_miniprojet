@@ -5,7 +5,7 @@
    Auteur Xiaochuan LI
 
 ## Simulink GUI interface
-   Version 2.0
+   Version 3.0
    Auteur Chongmo Zhang
    Dispositifs non linéaires : ordinateur et lampe
 
