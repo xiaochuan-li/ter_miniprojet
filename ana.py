@@ -27,8 +27,8 @@ class DataCsv:
     def save_spectres(self, path):
         with open(path, "w") as f:
             for index in self.pic_index:
-                f.write('{:9.7} {:9.7} {:9.7}\n'.format(self.fft_x[index], np.real(self.fft_y[index]),
-                                                        np.imag(self.fft_y[index])))
+                f.write('{:9.7} {:9.7} {:9.7}\n'.format(self.fft_x[index], np.real(self.fft_y[index]*2),
+                                                        np.imag(self.fft_y[index]*2)))
 
     def analyse(self, data_x=None, data_y=None):
         data_x = self.t if data_x is None else data_x
@@ -43,9 +43,9 @@ class DataCsv:
         plt.title("Plot des FFTs")
         plt.xlabel("frequence(Hz)")
         plt.ylabel("spectre")
-        plt.axis([min(self.point_x) - 100, max(self.f) + 250, min(self.fft_y_abs) - 0.01, max(self.fft_y_abs) + 0.01])
-        plt.plot(self.f, self.a, "k", label="FFT Générateur")
-        plt.plot(self.fft_x, self.fft_y_abs, 'y', label='FFT Calculé')
+        plt.axis([min(self.point_x) - 100, max(self.f) + 250, min(self.fft_y_abs) - 0.01, max(self.fft_y_abs*2) + 0.01])
+        plt.plot(self.f, self.a*2, "k", label="FFT Generateur")
+        plt.plot(self.fft_x, self.fft_y_abs*2, 'y', label='FFT Calcule')
         plt.scatter(self.point_x, self.point_y, label='Points Dominants')
         plt.legend()
         plt.savefig(os.path.join(self.save_path, "FFT.png"))
@@ -74,7 +74,7 @@ class DataCsv:
 
 
 class Data:
-    def __init__(self, csv_path, png_path, freq_stop=None, thread=0.25, save_dir="result", display=False):
+    def __init__(self, csv_path, png_path, freq_stop=None, thread=0.01, save_dir="result", display=False):
         self.plot_dir = save_dir
         self.display = display
         if not os.path.isdir(self.plot_dir):
@@ -151,7 +151,7 @@ def fft_auto(time, y, te=1 / 20000, fstop=None):
     return x, y_fft, y_fft_abs, y_recompose
 
 
-def find_pic(x, y, thread=0.25):
+def find_pic(x, y, thread=0.01):
     res, x_, y_ = [[], [], []]
     diff = (y[1:] - y[:-1]) / max(y)
     diff = diff[1:] * diff[:-1]
@@ -159,7 +159,7 @@ def find_pic(x, y, thread=0.25):
     for i, term in enumerate(diff):
         if term >= thread:
             x_.append(x[i + 1])
-            y_.append(y[i + 1])
+            y_.append(y[i + 1]*2)
             res.append(i + 1)
     return x_, y_, res
 
@@ -173,7 +173,7 @@ def unzip(data_input, types=None):
 def gen_f_pics(array_fe, list_points):
     new_array = np.zeros_like(array_fe, dtype=np.complex)
     for index in list_points:
-        new_array[index] = array_fe[index]
+        new_array[index] = array_fe[index]*2
     new_array = ifft(new_array)
     return new_array
 
