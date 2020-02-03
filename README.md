@@ -41,7 +41,7 @@
 │       ├── micronde.png
 │       ├── ordicharge.png
 │       └── ordiencharge.png
-├── exp20200202
+├── MATLAB_GUI
 │   ├── Charge_virtuel.mlapp
 │   ├── desktop.ini
 │   ├── lampe.txt
@@ -51,4 +51,4 @@
 
 9 directories, 29 files
 
-# Editeur: LI Xiaochuan / HUO Jiaxi
+# README Editeur: LI Xiaochuan / HUO Jiaxi
