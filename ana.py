@@ -10,13 +10,13 @@ from scipy.fftpack import fft, ifft
 class DataCsv:
     def __init__(self, data_time, data_freq, freq_stop, thread, save_path, display):
         """
-
-        :param data_time:
-        :param data_freq:
-        :param freq_stop:
-        :param thread:
-        :param save_path:
-        :param display:
+        fonction d'initialisation de la classe DataCsv
+        :param data_time: suite de temps
+        :param data_freq: suite de fréquence
+        :param freq_stop: seuil au-delà duquel les fréquences ne sont plus prises en considérations, valeur par défaut None
+        :param thread: seuil de l'offset du spectre dont on ne taite pas les valeurs en-dessous
+        :param save_path: adresse de l'enregistrement
+        :param display: boolean indiquant si on rafraichit l'image sur l'écran
         """
         self.save_path = save_path
         self.data_time = data_time
@@ -38,8 +38,8 @@ class DataCsv:
 
     def save_spectres(self, path):
         """
-
-        :param path:
+        Enregistrement du spectre
+        :param path: adresse de l'enregistrement
         :return:
         """
         with open(path, "w") as f:
@@ -54,10 +54,10 @@ class DataCsv:
 
     def analyse(self, data_x=None, data_y=None):
         """
-
-        :param data_x:
-        :param data_y:
-        :return:
+        Analyse des données
+        :param data_x: données du temps
+        :param data_y: données de la tension
+        :return: 
         """
         data_x = self.t if data_x is None else data_x
         data_y = self.i if data_y is None else data_y
@@ -72,7 +72,7 @@ class DataCsv:
 
     def plot_fft_o(self):
         """
-
+        Affichage du spectre après FFT
         :return:
         """
         plt.title("Plot des FFTs")
@@ -96,7 +96,7 @@ class DataCsv:
 
     def plot_o(self):
         """
-
+        Affichage de l'image initiale de la tension avant tout traitement
         :return:
         """
         plt.xlabel("temps(s)")
@@ -110,7 +110,7 @@ class DataCsv:
 
     def plot_r(self):
         """
-
+        Affichage de l'image du spectre après recomposition
         :return:
         """
         plt.xlabel("temps(s)")
@@ -129,7 +129,7 @@ class DataCsv:
 
     def plot_fft(self):
         """
-
+        Affichage de toutes les images de fréquence
         :return:
         """
         plt.title("Plot des FFTs")
@@ -154,7 +154,7 @@ class DataCsv:
 
     def plot_recompose(self):
         """
-
+        Affichage de toutes les images avant FFT
         :return:
         """
         plt.title("Plot des Signals")
@@ -181,7 +181,7 @@ class DataCsv:
 
     def toString(self):
         """
-
+        Affichaage de toutes les données 
         :return:
         """
         res = list(zip(self.point_x, self.point_y))
@@ -194,6 +194,9 @@ class DataCsv:
 
 
 class Data(DataCsv):
+    """
+    Sous classe de la classe DataCsv
+    """
     def __init__(
             self,
             csv_path,
@@ -204,13 +207,13 @@ class Data(DataCsv):
             display=False,
     ):
         """
-
-        :param csv_path:
-        :param png_path:
-        :param freq_stop:
-        :param thread:
-        :param save_dir:
-        :param display:
+        Fonction de l'initialisation de la sous classe Data
+        :param csv_path: Adresse du fichier CSV initial
+        :param png_path: Adresse de l'image initiale
+        :param freq_stop: seuil au-delà duquel les fréquences ne sont plus prises en considérations, valeur par défaut None
+        :param thread: seuil de l'offset du spectre dont on ne taite pas les valeurs en-dessous
+        :param save_dir: Dossier de l'enregistrement des résultats de l'analyse
+        :param display: boolean indiquant si on rafraichit l'image sur l'écran
         """
         self.plot_dir = save_dir
         self.display = display
@@ -235,7 +238,7 @@ class Data(DataCsv):
 
     def show_res_gen(self):
         """
-
+        Affichage de l'image initiale
         :return:
         """
         if not self.display:
@@ -247,8 +250,8 @@ class Data(DataCsv):
 
 def read_txt_file(path="Lampe.csv"):
     """
-
-    :param path:
+    Lecture du fichier CSV
+    :param path: Adresse du fichier
     :return:
     """
     with open(path, "r") as f:
@@ -288,33 +291,15 @@ def read_txt_file(path="Lampe.csv"):
             return None, None
 
 
-def trains(s):
-    """
-
-    :param s:
-    :return:
-    """
-    s.replace("E", "*10**")
-    return eval(s)
-
-
-def trans_list(l):
-    """
-
-    :param l:
-    :return:
-    """
-    return [trains(term) for term in l]
-
 
 def fft_auto(time, y, te=1 / 20000, fstop=None):
     """
-
-    :param time:
-    :param y:
-    :param te:
-    :param fstop:
-    :return:
+    FFT automatique
+    :param time: suite du temps
+    :param y: suite de tensions
+    :param te: l'inverse de la fréqunce de prise d'échantillon
+    :param fstop: seuil au-delà duquel les fréquences ne sont plus prises en considérations, valeur par défaut None
+    :return: x(np.array)=gamme de fréquence, y_fft(np.array, Complexe)=Données complètes après FFT, y_fft_abs (np.array)=valeur absolue après FFT, y_ifft (np.array, Complexe)= iFFT après FFT  
     """
     x = np.linspace(0, len(time) * te, len(time)) / (len(time) * te ** 2)
     y_fft = fft(y)
@@ -331,11 +316,11 @@ def fft_auto(time, y, te=1 / 20000, fstop=None):
 
 def find_pic(x, y, thread=0.25):
     """
-
-    :param x:
-    :param y:
-    :param thread:
-    :return:
+    Recheche du pic à partir des données
+    :param x: l'axe horizontal
+    :param y: l'axe vertical
+    :param thread: seuil de l'offset du spectre dont on ne taite pas les valeurs en-dessous
+    :return: x_ (liste)= fréquences dont la valeur du pics > seuil, y_(liste)= valeurs>seuil, res (liste)= indexe des fréquences précédentes
     """
     res, x_, y_ = [[], [], []]
     diff = (y[1:] - y[:-1]) / max(y)
@@ -351,10 +336,10 @@ def find_pic(x, y, thread=0.25):
 
 def unzip(data_input, types=None):
     """
-
-    :param data_input:
-    :param types:
-    :return:
+    Tri d'une liste de trois catégories d'éléments en trois listes d'une catégorie d'éléments
+    :param data_input: La liste initiale
+    :param types: None en général
+    :return: Un ensemble de trois listes après le tri
     """
     if types is None:
         types = ["time", "Ampere", "Volt"]
@@ -363,10 +348,10 @@ def unzip(data_input, types=None):
 
 def gen_f_pics(array_fe, list_points):
     """
-
-    :param array_fe:
-    :param list_points:
-    :return:
+    Retrouver les fréquences à partir des indexes contenues dans res (voir fonction find_pic)
+    :param array_fe: liste complète des fréquences
+    :param list_points: liste des indexes
+    :return: new_array (np.array)= les fréquences
     """
     new_array = np.zeros_like(array_fe, dtype=np.complex)
     for index in list_points:
@@ -377,9 +362,9 @@ def gen_f_pics(array_fe, list_points):
 
 def check_dir(dir):
     """
-
-    :param dir:
-    :return:
+    Vérification de l'existence de dossier et en cas de non existence, le créer
+    :param dir: adresse du dossier
+    :return: dir (string)= adresse du dossier
     """
     if not os.path.isdir(dir):
         os.mkdir(dir)
@@ -389,12 +374,14 @@ def check_dir(dir):
 class Config:
     def __init__(self, csv_dir, png_dir, freq_stop, save_dir, display=False):
         """
-
-        :param csv_dir:
-        :param png_dir:
-        :param freq_stop:
-        :param save_dir:
-        :param display:
+        traitement pas lots des données
+        :param csv_dir: Adresse du dossier des fichiers CSV initiaux
+        :param png_dir: Adresse du dossier des images initiales
+        :param freq_stop: seuil au-delà duquel les fréquences ne sont plus prises en considérations, valeur par défaut None
+        :param thread: seuil de l'offset du spectre dont on ne taite pas les valeurs en-dessous
+        :param save_dir: Dossier de l'enregistrement des résultats de l'analyse
+        :param display: boolean indiquant si on rafraichit l'image sur l'écran
+     
         """
         self.csv_dir = check_dir(csv_dir)
         self.png_dir = check_dir(png_dir)
@@ -405,8 +392,8 @@ class Config:
 
     def __call__(self, *args, **kwargs):
         """
-
-        :param args:
+        Overwrite de la fonction Call 
+        :param args: 
         :param kwargs:
         :return:
         """
@@ -429,7 +416,7 @@ class Config:
 
     def match(self):
         """
-        
+        Faire un lien entre le fichier csv et le fichier png
         :return:
         """
         csv_lst = list(filter(lambda x: ".csv" in x, os.listdir(self.csv_dir)))
